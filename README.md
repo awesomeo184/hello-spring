@@ -38,3 +38,62 @@
   -  junit: 테스트 프레임워크
   -  mockito: 목 라이브러리
   -  assertj: 테스트 코드를 좀 더 편하게 작성하게 도와주는 라이브러리 spring-test: 스프링 통합 테스트 지원
+  
+
+## 3강 View 환경설정
+
+### Welcome Page
+
+- src/main/resources/static 에 index.html 파일을 생성하면 스프링부트가 알아서 홈에 렌더링해줌
+
+### Controller
+
+
+
+`@Controller`
+
+`@GetMapping("url endpoint")`
+
+`model.addAttribute(key, value)`
+
+key = 템플릿에서 사용할 변수, value = 전달할 값
+
+`return "html이름"`
+
+
+
+컨트롤러에서 리턴 값으로 문자열을 반환하면 viewResolver가 화면을 찾아서 처리한다.
+
+`resources:templates/ +{ViewName}+ .html`
+
+
+
+pkg hello.hellospring.controller
+
+```java
+ @Controller
+ public class HelloController {
+   
+   @GetMapping("hello")
+   public String hello(Model model) {
+     model.addAttribute("data", "HelloWorld!!"); 
+     return "hello";
+   }
+ }
+```
+
+
+
+resources/templates/hello.html
+
+```html
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org"> <head>
+  <title>Hello</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /> </head>
+<body>
+<p th:text="'안녕하세요. ' + ${data}" >안녕하세요. 손님</p>
+</body>
+</html>
+```
+
