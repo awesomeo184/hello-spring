@@ -106,10 +106,110 @@ resources/templates/hello.html
 1. `./gradlew build`
 
 2. `cd build/libs`
-
 3. `java -jar hello-spring-0.0.1-SNAPSHOT.jar`
-
 4. 실행확인
 
-   
 
+
+## 5 ~ 7 강 스프링 웹 개발의 기초
+
+1. 정적 컨텐츠
+2. MVC와 템플릿 엔진
+3. API
+
+
+
+### 정적 컨텐츠
+
+스프링 부트는 기본적으로 정적 컨텐츠 기능을 제공한다.
+
+`resources/static/hello-static.html`
+
+```html
+<!DOCTYPE HTML>
+<html>
+<head>
+  <title>static content</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+정적 컨텐츠 입니다.
+</body>
+</html>
+```
+
+그냥 이렇게 파일을 생성한 뒤 서버를 켜서 `http://localhost:8080/hello-static.html` 로 이동하면 해당 파일이 렌더링된 것을 확인할 수 있음
+
+스프링 부트의 정적 컨텐츠 제공 기능
+
+1. 웹 서버로 요청이 들어오면 톰캣 서버는 해당 내용을 스프링으로 보낸다.
+
+2. 스프링은 컨트롤러에 관련 내용이 있는지 뒤져본다.
+
+3. 없다면 static 디렉토리를 뒤져보고 찾으면 반환한다.
+
+
+
+### MVC와 템플릿 엔진
+
+MVC(Model, View, Controller): 관심사의 분리. View는 화면을 그리는데 집중, Model과 Controller는 비즈니스 로직과 데이터 처리에 집중.
+
+```java
+    @GetMapping("hello-mvc")
+    public String helloMvc(@RequestParam("name") String name, Model model) {
+        model.addAttribute("name", name);
+        return "hello-template";
+    }
+```
+
+
+
+`resources/templates/hello-template.html`
+
+```html
+<html xmlns:th="http://www.thymeleaf.org"> <body>
+<p th:text="'hello ' + ${name}">여기는 서버 구동 없이 템플릿 파일을 그대로 열었을 때 나타남</p> </body>
+</html>
+```
+
+
+
+`http://localhost:8080/hello-mvc?name=spring` 으로 요청이 들어오면, "spring"을 인자로 받아서 모델의 value로 전달한다.
+
+controller가 model과 return값을 viewResolver에게 전달하면 리졸버는 맞는 화면을 찾아서 처리한다.
+
+
+
+### API
+
+view 없이 정보를 바로 전달한다.
+
+
+
+Api 방식을 이용할 때는 @ResponseBody 애노테이션을 달아줘야 한다. 그래야 ViewResolver를 사용하지 않고 HTTP BODY에 내용을 직접 전달한다.
+
+
+
+```java
+    @GetMapping("hello-string")
+    @ResponseBody
+    public String helloString(@RequestParam("name") String name) {
+        return "hello " + name;
+    }
+```
+
+```java
+    @GetMapping("hello-api")
+    @ResponseBody
+    public Hello helloApi(@RequestParam("name") String name) {
+        Hello hello = new Hello();
+        hello.setName(name);
+        return hello;
+    }
+```
+
+둘 다 api 방식이지만 첫번째 코드는 문자열을 반환하고 있고, 두번째 코드는 Hello라는 객체를 반환하고 있다.
+
+@ResponseBody 를 사용하면 HTTP의 BODY에 문자 내용을 직접 반환하고 viewResolver 대신에 HttpMessageConverter 가 동작한다.
+
+기본 문자처리는 StringHttpMessageConverter가 기본 객체처리는 MappingJackson2HttpMessageConverter가 담당한다. 객체는 Json 방식으로 넘겨준다.
