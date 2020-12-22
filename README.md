@@ -213,3 +213,64 @@ Api 방식을 이용할 때는 @ResponseBody 애노테이션을 달아줘야 한
 @ResponseBody 를 사용하면 HTTP의 BODY에 문자 내용을 직접 반환하고 viewResolver 대신에 HttpMessageConverter 가 동작한다.
 
 기본 문자처리는 StringHttpMessageConverter가 기본 객체처리는 MappingJackson2HttpMessageConverter가 담당한다. 객체는 Json 방식으로 넘겨준다.
+
+
+
+## 8강 ~ 11강 회원관리 예제, 테스트 케이스 작성
+
+비즈니스 요구사항 정리
+
+컨트롤러
+
+서비스: 핵심 비즈니스 로직 구현 (회원은 중복 가입이 안된다 등)
+
+도메인 : 비즈니스 도메인 객체
+
+리포지토리 : 데이터베이스에 접근, 도메인 객체를 DB에 저장하고 관리 
+
+
+
+테스트 케이스는 순서를 보장하지 않는다.
+
+테스트 간에 의존성이 발생하도록 설계해서는 안됨.
+
+테스트 클래스 안에서 생성한 MemoryMemberRepository는 각 테스트 메서드를 수행할 때마다, 내부 값이 변경된다. 
+
+@AfterEach 를 통해서 각 테스트를 실행하고 나서 MemoryMemberRepository를 초기화하는 작업을 해주어야  함.
+
+
+
+Actual? expected?
+
+actual에는 테스트하고자 하는 기능의 반환값을 넣어준다. expected에는 그 값이 가져야할 값을 넣어준다.
+
+
+
+11강 회원 서비스 작성
+
+비즈니스 로직은 service에 작성 (중복회원 방지 등)
+
+
+
+12 회원 서비스 테스트
+
+given, when, then
+
+
+
+예외가 제대로 터지는지를 테스트할때는 try catch를 사용할 수도 있지만 assertThrows가 선호된다.
+
+assertThrows(터져야될 예외.class, () -> 이 로직이 실행이 되면)
+
+assertThrows는 예외 객체를 반환한다.
+
+
+
+비즈니스 로직에서 사용하는 MemoryMemberRepository 객체를 테스트 로직에서도 공유하기 위해서, MemberService의 생성자로 MemoryMemberRepository를 넣어준다.
+
+@BeforeEach를 통해서 테스트 메서드 하나를 수행할 때마다 멤버 서비스 객체를 독립적으로 생성해준다.
+
+멤버 서비스 입장에서 메모리멤버리포지토리를 주입 당하기 때문에 이런것을 의존성 주입(Dependency Injection)이라고 함
+
+
+
